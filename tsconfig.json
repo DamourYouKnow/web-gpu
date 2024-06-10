@@ -4,8 +4,9 @@
     ],
     "compilerOptions": {
         "module": "ESNext",
-        "target": "es6",
+        "target": "ESNext",
         "esModuleInterop": true,
-        "lib": ["ESNext", "DOM"]
+        "lib": ["ESNext", "DOM"],
+        "types": ["@webgpu/types"]
     }
 }

@@ -22,7 +22,7 @@ export default function() {
             resolve({browser: true}),
             commonjs(),
             typescript({
-                target: 'es6',
+                target: 'ESNext',
                 sourceMap: !prod,
                 inlineSourceMap: !prod,
                 inlineSources: !prod
