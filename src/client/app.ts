@@ -6,15 +6,25 @@ async function main() {
     const device = await init();
 
     // Test code:
-    const rectangleMesh = Shapes.rectangle();
+    const mesh = Shapes.circle(0.5);
+    //const mesh = Shapes.rectangle();
 
     const vertexBuffer = device.createBuffer({
-        label: 'Triangle',
-        size: rectangleMesh.Size(),
+        label: 'Vertex buffer',
+        size: mesh.VertexSize(),
         usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
     });
 
-    device.queue.writeBuffer(vertexBuffer, 0, rectangleMesh.Vertices());
+    const indexBuffer = device.createBuffer({
+        label: 'Index buffer',
+        size: mesh.IndexSize(),
+        usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST
+    });
+
+    device.queue.writeBuffer(vertexBuffer, 0, mesh.Vertices());
+    if (mesh.IndexSize()) {
+        device.queue.writeBuffer(indexBuffer, 0, mesh.Indices());
+    }
 
     const vertexBufferLayout: GPUVertexBufferLayout = {
         arrayStride: 8,
@@ -25,6 +35,7 @@ async function main() {
         }]
     };
     
+    // TODO: Load shaders as external ressource through HTTP.
     const basicVertexShader = device.createShaderModule({
         label: 'Basic vertex shader',
         code: `
@@ -69,7 +80,7 @@ async function main() {
 
     const encoder = device.createCommandEncoder();
     
-    const pass = encoder.beginRenderPass({
+    const renderPass = encoder.beginRenderPass({
         colorAttachments: [{
            view: context.getCurrentTexture().createView(),
            loadOp: "clear",
@@ -78,16 +89,23 @@ async function main() {
         }]
     });
 
-    pass.setPipeline(renderPipeline);
-    pass.setVertexBuffer(0, vertexBuffer);
-    pass.draw(rectangleMesh.Count());
+    renderPass.setPipeline(renderPipeline);
+    renderPass.setVertexBuffer(0, vertexBuffer);
+    if (mesh.IndexSize()) {
+        // TODO: Support both formats through abstraction.
+        // TODO: Fix byte multiple for uint16.
+        renderPass.setIndexBuffer(indexBuffer, 'uint32');
+        renderPass.drawIndexed(mesh.VertexCount());
+    }
+    else {
+        renderPass.draw(mesh.VertexCount());
+    }
 
-    pass.end();
+    renderPass.end();
 
     const commandBuffer = encoder.finish();
     device.queue.submit([commandBuffer]);  
     device.queue.submit([encoder.finish()]);
-
 }
 
 async function init(): Promise<GPUDevice> {
