@@ -95,7 +95,7 @@ async function main() {
         // TODO: Support both formats through abstraction.
         // TODO: Fix byte multiple for uint16.
         renderPass.setIndexBuffer(indexBuffer, 'uint32');
-        renderPass.drawIndexed(mesh.VertexCount());
+        renderPass.drawIndexed(mesh.IndexCount());
     }
     else {
         renderPass.draw(mesh.VertexCount());

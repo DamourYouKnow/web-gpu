@@ -55,7 +55,7 @@ export const Shapes = {
         // TODO: Use index buffer.
         return new Mesh(vertices, indices);
     },
-    circle: function(radius: number=0.5, vertices: number=32) {
+    circle: function(radius: number=0.5, vertices: number=64) {
         // TODO: Assert vertices >= 3
 
         const verticeArray = new Float32Array((vertices + 1) * 2);
