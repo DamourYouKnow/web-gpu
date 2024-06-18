@@ -1,4 +1,5 @@
 import { Shapes } from "./geometry";
+import { requestFile } from "./web";
 
 main();
 
@@ -38,22 +39,12 @@ async function main() {
     // TODO: Load shaders as external ressource through HTTP.
     const basicVertexShader = device.createShaderModule({
         label: 'Basic vertex shader',
-        code: `
-            @vertex
-            fn vertexMain(@location(0) pos: vec2f) -> @builtin(position) vec4f {
-                return vec4f(pos, 0, 1);
-            }
-        `
+        code: await requestFile('shaders/basic-vertex.wgsl')
     });
 
     const basicFragmentShader = device.createShaderModule({
         label: 'Basic fragment shader',
-        code: `
-            @fragment
-            fn fragmentMain() -> @location(0) vec4f {
-                return vec4f(1, 0, 0, 1); // (Red, Green, Blue, Alpha)
-            }
-        `
+        code: await requestFile('shaders/basic-fragment.wgsl')
     });
 
     // TODO: Share with init
